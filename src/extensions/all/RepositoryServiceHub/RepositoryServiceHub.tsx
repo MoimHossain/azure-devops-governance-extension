@@ -5,7 +5,7 @@ import { GitServiceIds, IVersionControlRepositoryService } from "azure-devops-ex
 import { Header, TitleSize } from "azure-devops-ui/Header";
 import { Page } from "azure-devops-ui/Page";
 
-import { showRootComponent } from "../../Common";
+import { showRootComponent } from "../../common";
 import { GitRepository } from "azure-devops-extension-api/Git/Git";
 
 interface IRepositoryServiceHubContentState {
