@@ -59,10 +59,9 @@ class HubContent extends React.Component<{}, IHubContentState> {
 
                     <Tab name="Overview" id="overview" />
                     <Tab name="Repositories" id="repository" />
-                    <Tab name="Package Feeds" id="package-feed" />
-                    <Tab name="Governance history" id="history" />
+                    <Tab name="Package Feeds" id="package-feed" />                   
                     <Tab name="Container Registries" id="container-registry" />
-                    
+                    <Tab name="Operations" id="history" />
                 </TabBar>
 
                 { this.getPageContent() }

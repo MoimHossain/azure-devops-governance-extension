@@ -2,7 +2,7 @@ using System;
 
 namespace CloudOvenGovernance
 {
-    public class WeatherForecast
+    public class Repository
     {
         public DateTime Date { get; set; }
 

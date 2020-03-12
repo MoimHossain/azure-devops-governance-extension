@@ -29,10 +29,19 @@ export class RepoTab extends React.Component<{}, IRepoTabState> {
 
     private async initializeState(): Promise<void> {
         await SDK.ready();
-
-        console.log('Getting token');
+  
         const token = await SDK.getAppToken();
         console.log(token);
+
+        const response = await fetch("https://localhost:5001/api/repository", {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+        const r = await response.json();
+        console.log(r);
         
         const userName = SDK.getUser().displayName;
         this.setState({
@@ -44,8 +53,11 @@ export class RepoTab extends React.Component<{}, IRepoTabState> {
         const projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
         const project = await projectService.getProject();
         if (project) {
-            this.setState({ projectName: project.name });
+            this.setState({ projectName: project.name });           
         }
+
+
+
 
         const navService = await SDK.getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
         const navElements = await navService.getPageNavigationElements();

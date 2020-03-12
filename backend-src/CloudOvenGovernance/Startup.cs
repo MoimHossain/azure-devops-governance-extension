@@ -30,14 +30,25 @@ namespace CloudOvenGovernance
         {
             services.AddControllers();
 
-            var _secret = Environment.GetEnvironmentVariable("CloudOvenADOGovernanceExtToken");
+            var certificate = Environment.GetEnvironmentVariable("CloudOvenADOGovernanceExtToken");
+
+            services.AddCors((corsOption) =>
+            {
+                corsOption
+                    .AddPolicy("cors-policy",
+                        pb =>
+                            pb
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowAnyOrigin());
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer((o) =>
                     {
                         o.TokenValidationParameters = new TokenValidationParameters()
                         {
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret)),
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(certificate)),
                             ValidateIssuer = false,
                             ValidateAudience = false,
                             ValidateActor = false,
@@ -56,12 +67,10 @@ namespace CloudOvenGovernance
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("cors-policy");
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthentication();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
