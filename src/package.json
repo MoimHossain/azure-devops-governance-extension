@@ -4,7 +4,8 @@
   "description": "Azure DevOps extensions that provides some ease to developers still preserving the governancce rails intact.",
   "main": "index.js",
   "scripts": {
-    "clean": "rimraf ./dist",
+    "clean": "rimraf ./dist && npm run delete-pacakges",
+    "delete-pacakges": "rimraf *.vsix",
     "compile": "npm run clean && webpack --mode production",
     "compile:dev": "npm run clean && webpack --mode development",
     "build": "npm run compile",
