@@ -456,7 +456,7 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-backend-src/CloudOvenGovernance/.vs/CloudOvenGovernance/v16/.suo
-backend-src/CloudOvenGovernance/.vs/CloudOvenGovernance/DesignTimeBuild/.dtbcache
-backend-src/CloudOvenGovernance/.vs/CloudOvenGovernance/DesignTimeBuild/.dtbcache
-backend-src/CloudOvenGovernance/.vs/CloudOvenGovernance/v16/Server/sqlite3/db.lock
+
+backend-src/CloudOvenGovernance/.vs/
+backend-src/CloudOvenGovernance/obj/
+backend-src/CloudOvenGovernance/bin/
