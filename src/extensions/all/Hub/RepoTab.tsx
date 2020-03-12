@@ -2,7 +2,7 @@ import * as React from "react";
 import * as SDK from "azure-devops-extension-sdk";
 import { CommonServiceIds, IProjectPageService, IHostNavigationService, INavigationElement, IPageRoute } from "azure-devops-extension-api";
 
-export interface IRepositoryTabState {
+export interface IRepoTabState {
     userName?: string;
     projectName?: string;
     iframeUrl?: string;
@@ -13,7 +13,7 @@ export interface IRepositoryTabState {
     route?: IPageRoute;
 }
 
-export class RepositoryTab extends React.Component<{}, IRepositoryTabState> {
+export class RepoTab extends React.Component<{}, IRepoTabState> {
 
     constructor(props: {}) {
         super(props);
@@ -29,6 +29,10 @@ export class RepositoryTab extends React.Component<{}, IRepositoryTabState> {
 
     private async initializeState(): Promise<void> {
         await SDK.ready();
+
+        console.log('Getting token');
+        const token = await SDK.getAppToken();
+        console.log(token);
         
         const userName = SDK.getUser().displayName;
         this.setState({

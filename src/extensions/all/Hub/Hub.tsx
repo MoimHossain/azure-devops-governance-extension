@@ -12,7 +12,7 @@ import { Tab, TabBar, TabSize } from "azure-devops-ui/Tabs";
 import { OverviewTab } from "./OverviewTab"; 
 import { NavigationTab } from "./NavigationTab";
 import { ExtensionDataTab } from "./ExtensionDataTab";
-import { RepositoryTab } from "./RepositoryTab";
+import { RepoTab } from "./RepoTab";
 import { MessagesTab } from "./MessagesTab";
 import { showRootComponent } from "../../common";
 
@@ -60,8 +60,9 @@ class HubContent extends React.Component<{}, IHubContentState> {
                     <Tab name="Overview" id="overview" />
                     <Tab name="Repositories" id="repository" />
                     <Tab name="Package Feeds" id="package-feed" />
-                    <Tab name="Container Registries" id="container-registry" />
                     <Tab name="Governance history" id="history" />
+                    <Tab name="Container Registries" id="container-registry" />
+                    
                 </TabBar>
 
                 { this.getPageContent() }
@@ -90,7 +91,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
             return <MessagesTab />;
         }
         else if (selectedTabId === "history") {
-            return <RepositoryTab />;
+            return <RepoTab />;
         }
     }
 
