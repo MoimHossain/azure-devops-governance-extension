@@ -60,6 +60,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
 
                     <Tab name="Overview" id="overview" />
                     <Tab name="Repositories" id="repository" />
+                    <Tab name="Key Vaults" id="key-vault" />                    
                     <Tab name="Package Feeds" id="package-feed" />                   
                     <Tab name="Container Registries" id="container-registry" />
                     <Tab name="Operations" id="history" />
@@ -89,6 +90,9 @@ class HubContent extends React.Component<{}, IHubContentState> {
         }
         else if (selectedTabId === "container-registry") {
             return <MessagesTab />;
+        }
+        else if(selectedTabId === "key-vault") {
+            return <RepositoryTab />;
         }
         else if (selectedTabId === "history") {
             return <RepoTab />;
