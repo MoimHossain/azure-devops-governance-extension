@@ -10,9 +10,10 @@ import { Page } from "azure-devops-ui/Page";
 import { Tab, TabBar, TabSize } from "azure-devops-ui/Tabs";
 
 import { OverviewTab } from "./OverviewTab"; 
-import { NavigationTab } from "./NavigationTab";
+
 import { ExtensionDataTab } from "./ExtensionDataTab";
 import { RepoTab } from "./RepoTab";
+import { RepositoryTab } from './RepositoryTab';
 import { MessagesTab } from "./MessagesTab";
 import { showRootComponent } from "../../common";
 
@@ -81,7 +82,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
             return <OverviewTab />;
         }
         else if (selectedTabId === "repository") {
-            return <NavigationTab />;
+            return <RepositoryTab />;
         }
         else if (selectedTabId === "package-feed") {
             return <ExtensionDataTab />;

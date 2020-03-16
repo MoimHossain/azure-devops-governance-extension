@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 
 namespace CloudOvenGovernance
 {
@@ -31,6 +33,8 @@ namespace CloudOvenGovernance
             services.AddControllers();
 
             var certificate = Environment.GetEnvironmentVariable("CloudOvenADOGovernanceExtToken");
+            var pat = Environment.GetEnvironmentVariable("AZDO_PERSONAL_ACCESS_TOKEN");
+            var orgUri = Environment.GetEnvironmentVariable("AZDO_ORG_SERVICE_URL");
 
             services.AddCors((corsOption) =>
             {
@@ -57,6 +61,11 @@ namespace CloudOvenGovernance
                             ValidateLifetime = true
                         };
                     });
+
+            // register the azure devops services
+            services.AddSingleton<VssConnection>(new VssConnection(
+                new Uri(orgUri), 
+                new VssBasicCredential(string.Empty, pat)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
