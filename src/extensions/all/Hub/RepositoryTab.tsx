@@ -65,7 +65,8 @@ export class RepositoryTab extends React.Component<{}, IRepositoryTabState> {
         return (
             <ListItem key={key || "list-item" + index} index={index} details={details}>
                 <div className="list-example-row flex-row h-scroll-hidden">
-                    <Icon iconName="repository-icon repository" size={IconSize.medium} />
+                <img alt="" className="contributed-icon contributed-icon-image bolt-image flex-noshrink" 
+                src="https://cdn.vsassets.io/ext/ms.vss-code-web/common-content/Nav-Code.0tJczmQtl3hyKtlh.png" />
                     <div
                         style={{ marginLeft: "10px", padding: "10px 0px" }}
                         className="flex-column h-scroll-hidden"
