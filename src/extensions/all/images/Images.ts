@@ -2,6 +2,8 @@
 
 export class Images {
 
+
+
     public getLoadingImage() : string {
         return this._loading;
     }

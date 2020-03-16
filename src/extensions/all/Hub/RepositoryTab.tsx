@@ -8,7 +8,7 @@ import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import { Icon, IconSize } from "azure-devops-ui/Icon";
 import { Card } from "azure-devops-ui/Card";
 import { ScrollableList, IListItemDetails, ListSelection, ListItem } from "azure-devops-ui/List";
-import { Images } from './../images/Images';
+import { Animation } from './../images/Animation';
 
 export interface IRepositoryTabState {
     loading: boolean;
@@ -43,7 +43,7 @@ export class RepositoryTab extends React.Component<{}, IRepositoryTabState> {
                 <Card>
                     {
                         loading &&
-                        <img style={{ width: 32, height: 32 }} src={(new Images()).getLoadingImage()} />
+                        <Animation />
                     }
                     {
                         (!loading && repos) &&
