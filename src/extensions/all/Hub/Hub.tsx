@@ -110,39 +110,25 @@ class HubContent extends React.Component<{}, IHubContentState> {
     }
 
     private getCommandBarItems(): IHeaderCommandBarItem[] {
-        return [
-            {
-              id: "panel",
-              text: "Repository",
-              onActivate: () => { this.setState({ selectedTabId: 'repository', repoExpanded: true }) },
-              iconProps: {
-                iconName: 'Add'
-              },
-              isPrimary: true,
-              tooltipProps: {
-                text: "Create Repository in Purpose using IRG"
-              }
-            },
-            {
-                id: "fullScreen",
-                ariaLabel: this.state.fullScreenMode ? "Exit full screen mode" : "Enter full screen mode",
-                iconProps: {
-                    iconName: this.state.fullScreenMode ? "BackToWindow" : "FullScreen"
-                },
-                onActivate: () => { this.onToggleFullScreenMode() }
-            },
-            {
+
+        const items = [];
+        const { selectedTabId } = this.state;
+        if (selectedTabId === "repository") {
+            items.push({
                 id: "panel",
-                text: "KeyVault",
-                onActivate: () => { this.onPanelClick() },
+                text: "Repository",
+                onActivate: () => { this.setState({ selectedTabId: 'repository', repoExpanded: true }) },
                 iconProps: {
                   iconName: 'Add'
                 },
+                isPrimary: true,
                 tooltipProps: {
-                  text: "Create KeyVault in Purpose using IRG"
+                  text: "Create Repository in Purpose using IRG"
                 }
-            },
-            {
+              });
+        }
+        else if (selectedTabId === "package-feed") {
+            items.push({
                 id: "panel",
                 text: "Package Feed",
                 onActivate: () => { this.onPanelClick() },
@@ -152,8 +138,10 @@ class HubContent extends React.Component<{}, IHubContentState> {
                 tooltipProps: {
                   text: "Create Package Feed in Purpose using IRG"
                 }
-            },
-            {
+            });
+        }
+        else if (selectedTabId === "container-registry") {
+            items.push({
                 id: "panel",
                 text: "Container Registry",
                 onActivate: () => { this.onPanelClick() },
@@ -163,26 +151,34 @@ class HubContent extends React.Component<{}, IHubContentState> {
                 tooltipProps: {
                   text: "Create Azure Container Registry in Purpose using IRG"
                 }
-            }
-        ];
+            });
+        }
+        else if(selectedTabId === "key-vault") {
+            items.push({
+                id: "panel",
+                text: "KeyVault",
+                onActivate: () => { this.onPanelClick() },
+                iconProps: {
+                  iconName: 'Add'
+                },
+                tooltipProps: {
+                  text: "Create KeyVault in Purpose using IRG"
+                }
+            });
+        }
+        else if (selectedTabId === "history") {
+            items.push({
+                id: "fullScreen",
+                ariaLabel: this.state.fullScreenMode ? "Exit full screen mode" : "Enter full screen mode",
+                iconProps: {
+                    iconName: this.state.fullScreenMode ? "BackToWindow" : "FullScreen"
+                },
+                onActivate: () => { this.onToggleFullScreenMode() }
+            });
+        }
+        return items;
     }
-    /*,
-            {
-              id: "customDialog",
-              text: "Custom Dialog",
-              onActivate: () => { this.onCustomPromptClick() },
-              tooltipProps: {
-                text: "Open a dialog with custom extension content"
-              }
-            },
-            {
-              id: "messageDialog",
-              text: "Message",
-              onActivate: () => { this.onMessagePromptClick() },
-              tooltipProps: {
-                text: "Open a simple message dialog"
-              }
-            }*/
+
 
     private async onMessagePromptClick(): Promise<void> {
         const dialogService = await SDK.getService<IHostPageLayoutService>(CommonServiceIds.HostPageLayoutService);
