@@ -24,6 +24,7 @@ import { OperationTab } from './OperationTab';
 import { showRootComponent } from "../../common";
 
 interface IHubContentState {
+    repoExpanded: boolean;
     selectedTabId: string;
     fullScreenMode: boolean;
     headerDescription?: string;
@@ -37,6 +38,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
         super(props);
 
         this.state = {
+            repoExpanded: false,
             selectedTabId: "overview",
             fullScreenMode: false
         };
@@ -89,7 +91,9 @@ class HubContent extends React.Component<{}, IHubContentState> {
             return <HomeTab />;
         }
         else if (selectedTabId === "repository") {
-            return <RepositoryTab />;
+            return <RepositoryTab 
+                repoExpanded={this.state.repoExpanded}
+                onCollapse={()=> this.setState({ repoExpanded: false })} />;
         }
         else if (selectedTabId === "package-feed") {
             return <PackageFeedTab />;
@@ -110,7 +114,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
             {
               id: "panel",
               text: "Repository",
-              onActivate: () => { this.onPanelClick() },
+              onActivate: () => { this.setState({ selectedTabId: 'repository', repoExpanded: true }) },
               iconProps: {
                 iconName: 'Add'
               },

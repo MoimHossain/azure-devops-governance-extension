@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "cloudoven-governance-extension",
     "publisher": "MoimHossain",
-    "version": "1.0.102",
+    "version": "1.0.112",
     "name": "CloudOven Governance",
     "description": "Azure DevOps extensions that provides some ease to developers still preserving the governancce rails intact.",
     "public": false,

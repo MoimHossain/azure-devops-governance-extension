@@ -5,16 +5,26 @@ import * as SDK from "azure-devops-extension-sdk";
 import { CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
 import { BackendService } from './BackendService';
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
-import { Icon, IconSize } from "azure-devops-ui/Icon";
+import { Panel } from "azure-devops-ui/Panel";
 import { Card } from "azure-devops-ui/Card";
 import { ScrollableList, IListItemDetails, ListSelection, ListItem } from "azure-devops-ui/List";
 import { Animation } from './../images/Animation';
+import { Button } from "azure-devops-ui/Button";
+import { ButtonGroup } from "azure-devops-ui/ButtonGroup";
+import { ObservableValue } from "azure-devops-ui/Core/Observable";
+import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 
+const simpleObservable = new ObservableValue<string>("");
 export interface IRepositoryTabState {
     loading: boolean;
     projectName?: string;
     projectId?: string;
     repos?: any;
+}
+
+export interface IRepositoryTabProperties {
+    repoExpanded: boolean;
+    onCollapse(): any
 }
 
 interface IRepositoryItem {
@@ -23,10 +33,10 @@ interface IRepositoryItem {
     url?: string;
 }
 
-export class RepositoryTab extends React.Component<{}, IRepositoryTabState> {
+export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRepositoryTabState> {
     private selection = new ListSelection(true);
 
-    constructor(props: {}) {
+    constructor(props: IRepositoryTabProperties) {
         super(props);
         this.state = { loading: true };
     }
@@ -55,7 +65,33 @@ export class RepositoryTab extends React.Component<{}, IRepositoryTabState> {
                                 width="100%"
                             />
                         </div>
-
+                    }
+                    
+                    {
+                        this.props.repoExpanded && 
+                        <Panel
+                            onDismiss={() => this.props.onCollapse()}
+                            titleProps={{ text: "New Repository" }}
+                            description={
+                                "Please fill out the information below."
+                            }
+                            footerButtonProps={[
+                                { text: "Cancel", onClick: () => this.props.onCollapse() },
+                                { text: "Create", primary: true }
+                            ]}>
+                            <div>
+                            
+                                <TextField
+                                        value={simpleObservable}
+                                        readOnly={false}
+                                        spellCheck={false}     
+                                        required={true}                                   
+                                        onChange={(e, newValue) => (simpleObservable.value = newValue)}
+                                        placeholder="Enter Repository Name"
+                                        width={TextFieldWidth.standard}
+                                    />
+                            </div>
+                        </Panel>
                     }
                 </Card>
             </div>
