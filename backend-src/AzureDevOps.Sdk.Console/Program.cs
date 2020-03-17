@@ -1,101 +1,72 @@
 ﻿
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CloudOvenGovernance.Dtos;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
+using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
+using System;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
-namespace CloudOvenGovernance.Controllers
+namespace AzureDevOps.Sdk.ConsoleApp
 {
-    [ApiController]
-    [Route("api/{projectId}/[controller]")]
-    [Authorize]
-    public class RepositoryController : ControllerBase
+    class Program
     {
-        #region Constructions
-
-        private ILogger<RepositoryController> _logger = default(ILogger<RepositoryController>);
-
-        private GitHttpClient _gitClient = default(GitHttpClient);
-
-        public RepositoryController(ILogger<RepositoryController> logger, VssConnection connection)
+        static void Main(string[] args)
         {
-            this._logger = logger;
-            this._gitClient = connection.GetClient<GitHttpClient>(); 
+            var pat = Environment.GetEnvironmentVariable("AZDO_PERSONAL_ACCESS_TOKEN");
+            var orgUri = Environment.GetEnvironmentVariable("AZDO_ORG_SERVICE_URL");
+
+            GetRepoAsync(pat, orgUri).Wait();
         }
 
-        #endregion
-
-        [HttpPost("{repositoryId}")]
-        public async Task UpdateAsync(
-            Guid projectId, Guid repositoryId, 
-            [FromBody]ResourceChangePayload payload)
+        private static async Task GetRepoAsync(string pat, string orgUri)
         {
-            var purpose = payload.Purpose;
+            var projectId = Guid.Parse("c335132d-ff5f-4371-ae28-ba7940f6eb92");
+            var purpose = "P000123";
             var repoName = $"{purpose}-ResourceAsCode";
-            var master = "master";
+            var connection = new VssConnection(
+                new Uri(orgUri),
+                new VssBasicCredential(string.Empty, pat));
 
-            var repositories = await GetAllRepositoryAsync(projectId, purpose, repoName);
+            var gitClient = connection.GetClient<GitHttpClient>();
+
+            var repositories = await gitClient.GetRepositoriesAsync(projectId);
+
+            // If there is not yet a purpose repo create
+            if(!repositories.Any(g=> g.Name.StartsWith(purpose, StringComparison.OrdinalIgnoreCase)))
+            {
+                await gitClient.CreateRepositoryAsync(new GitRepositoryCreateOptions
+                {
+                    Name = repoName,
+                    ProjectReference = new Microsoft.TeamFoundation.Core.WebApi.TeamProjectReference 
+                    {
+                        Id = projectId
+                    }
+                });
+                repositories = await gitClient.GetRepositoriesAsync(projectId);
+            }
 
             var repository = repositories
                 .FirstOrDefault(g => g.Name.StartsWith(purpose, StringComparison.OrdinalIgnoreCase));
 
             if (repository != null)
             {
-                var references = await _gitClient.GetRefsAsync(repository.Id);
+                var references = await gitClient.GetRefsAsync(repository.Id);
 
                 if (!references.Any(r => r.Name.EndsWith("master", StringComparison.OrdinalIgnoreCase)))
                 {
-                    await CreateMasterBranchAsync(_gitClient, repository);
+                    await CreateMasterBranchAsync(gitClient, repository);
                 }
 
-                references = await _gitClient.GetRefsAsync(repository.Id);
-                var masterRef = references
-                    .FirstOrDefault(r => r.Name.EndsWith(master, StringComparison.OrdinalIgnoreCase));
-
-                await CreateCommitsAndPullRequest(_gitClient, repository, masterRef);
-            }
-        }
-
-
-        [HttpGet]
-        public async Task<IEnumerable<GitRepository>> GetAsync(Guid projectId)
-        {
-            var repo = await _gitClient.GetRepositoriesAsync(projectId);
-
-            return repo;
-        }
-
-        #region Private methods
-
-        private async Task<List<GitRepository>> GetAllRepositoryAsync(
-            Guid projectId, string purpose, string repoName)
-        {
-            var repositories = await _gitClient.GetRepositoriesAsync(projectId);
-
-            // If there is not yet a purpose repo create
-            if (!repositories.Any(g => g.Name.StartsWith(purpose, StringComparison.OrdinalIgnoreCase)))
-            {
-                await _gitClient.CreateRepositoryAsync(new GitRepositoryCreateOptions
-                {
-                    Name = repoName,
-                    ProjectReference = new Microsoft.TeamFoundation.Core.WebApi.TeamProjectReference
-                    {
-                        Id = projectId
-                    }
-                });
-                repositories = await _gitClient.GetRepositoriesAsync(projectId);
+                references = await gitClient.GetRefsAsync(repository.Id);
+                var masterRef = references.FirstOrDefault(r => r.Name.EndsWith("master", StringComparison.OrdinalIgnoreCase));
+                
+                await CreateCommitsAndPullRequest(gitClient, repository, masterRef);
             }
 
-            return repositories;
+            Console.ReadKey();
         }
-
 
         private static async Task CreateCommitsAndPullRequest(
             GitHttpClient gitClient, GitRepository repository, GitRef masterRef)
@@ -106,7 +77,7 @@ namespace CloudOvenGovernance.Controllers
             var branchRef = $"refs/heads/{branchName}";
             var masterBranchRef = $"refs/heads/master";
 
-            await gitClient.CreatePushAsync(new GitPush
+            var push = await gitClient.CreatePushAsync(new GitPush
             {
                 RefUpdates = new List<GitRefUpdate>
                         {
@@ -138,7 +109,7 @@ namespace CloudOvenGovernance.Controllers
                         }
             }, repository.Id);
 
-            await gitClient.CreatePullRequestAsync(new GitPullRequest
+            var pr = await gitClient.CreatePullRequestAsync(new GitPullRequest 
             {
                 SourceRefName = branchRef,
                 TargetRefName = masterBranchRef,
@@ -153,7 +124,7 @@ namespace CloudOvenGovernance.Controllers
             var branchRef = $"refs/heads/{branchName}";
             var emptyId = "0000000000000000000000000000000000000000";
 
-            await gitClient.CreatePushAsync(new GitPush
+            var push = await gitClient.CreatePushAsync(new GitPush
             {
                 RefUpdates = new List<GitRefUpdate>
                         {
@@ -185,6 +156,5 @@ namespace CloudOvenGovernance.Controllers
                         }
             }, repository.Id);
         }
-        #endregion
     }
 }
