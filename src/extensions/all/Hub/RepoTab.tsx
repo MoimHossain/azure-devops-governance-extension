@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as SDK from "azure-devops-extension-sdk";
+import { Constants } from './Constants';
 import { CommonServiceIds, IProjectPageService, IHostNavigationService, INavigationElement, IPageRoute } from "azure-devops-extension-api";
 
 export interface IRepoTabState {
@@ -33,7 +34,9 @@ export class RepoTab extends React.Component<{}, IRepoTabState> {
         const token = await SDK.getAppToken();
         console.log(token);
 
-        const response = await fetch("https://localhost:5001/api/repository", {
+        const c = new Constants();
+
+        const response = await fetch(`${c.getUri()}api/repository`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

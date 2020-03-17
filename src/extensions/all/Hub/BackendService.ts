@@ -1,7 +1,7 @@
 
 import * as SDK from "azure-devops-extension-sdk";
 
-const backendHost = "https://localhost:5001/api";
+const backendHost = "https://azuredevops-restapi.azurewebsites.net/api";
 
 
 export class BackendService {
