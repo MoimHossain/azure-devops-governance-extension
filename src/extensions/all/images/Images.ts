@@ -2,7 +2,19 @@
 
 export class Images {
 
+    private getBasePath() {
+        const url = window.location.href;
+        const baseUrl = url.substr(0, url.indexOf("/dist/"));
+        return baseUrl;
+    }
 
+    public getAcrIcon(): string {
+        return `${this.getBasePath()}/assets/images/azure-cr-logo.png`;
+    }
+
+    public getKeyVaultIcon(): string {
+        return `${this.getBasePath()}/assets/images/azure-key-vault-icon.png`;
+    }
 
     public getLoadingImage() : string {
         return this._loading;

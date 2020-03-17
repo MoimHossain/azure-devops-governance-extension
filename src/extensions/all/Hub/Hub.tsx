@@ -9,12 +9,18 @@ import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
 import { Page } from "azure-devops-ui/Page";
 import { Tab, TabBar, TabSize } from "azure-devops-ui/Tabs";
 
-import { OverviewTab } from "./OverviewTab"; 
+// import { OverviewTab } from "./OverviewTab"; 
+// import { ExtensionDataTab } from "./ExtensionDataTab";
+// import { MessagesTab } from "./MessagesTab";
 
-import { ExtensionDataTab } from "./ExtensionDataTab";
-import { RepoTab } from "./RepoTab";
+import { AcrTab } from './AcrTab';
+import { HomeTab } from './Home';
+
+import { KeyVaultTab } from './KeyVault';
+import { PackageFeedTab } from './PackageFeedTab';
 import { RepositoryTab } from './RepositoryTab';
-import { MessagesTab } from "./MessagesTab";
+
+import { OperationTab } from './OperationTab';
 import { showRootComponent } from "../../common";
 
 interface IHubContentState {
@@ -80,22 +86,22 @@ class HubContent extends React.Component<{}, IHubContentState> {
     private getPageContent() {
         const { selectedTabId } = this.state;
         if (selectedTabId === "overview") {
-            return <OverviewTab />;
+            return <HomeTab />;
         }
         else if (selectedTabId === "repository") {
             return <RepositoryTab />;
         }
         else if (selectedTabId === "package-feed") {
-            return <ExtensionDataTab />;
+            return <PackageFeedTab />;
         }
         else if (selectedTabId === "container-registry") {
-            return <MessagesTab />;
+            return <AcrTab />;
         }
         else if(selectedTabId === "key-vault") {
-            return <RepositoryTab />;
+            return <KeyVaultTab />;
         }
         else if (selectedTabId === "history") {
-            return <RepoTab />;
+            return <OperationTab />;
         }
     }
 
@@ -103,22 +109,14 @@ class HubContent extends React.Component<{}, IHubContentState> {
         return [
             {
               id: "panel",
-              text: "Panel",
+              text: "Repository",
               onActivate: () => { this.onPanelClick() },
               iconProps: {
                 iconName: 'Add'
               },
               isPrimary: true,
               tooltipProps: {
-                text: "Open a panel with custom extension content"
-              }
-            },
-            {
-              id: "messageDialog",
-              text: "Message",
-              onActivate: () => { this.onMessagePromptClick() },
-              tooltipProps: {
-                text: "Open a simple message dialog"
+                text: "Create Repository in Purpose using IRG"
               }
             },
             {
@@ -130,15 +128,57 @@ class HubContent extends React.Component<{}, IHubContentState> {
                 onActivate: () => { this.onToggleFullScreenMode() }
             },
             {
+                id: "panel",
+                text: "KeyVault",
+                onActivate: () => { this.onPanelClick() },
+                iconProps: {
+                  iconName: 'Add'
+                },
+                tooltipProps: {
+                  text: "Create KeyVault in Purpose using IRG"
+                }
+            },
+            {
+                id: "panel",
+                text: "Package Feed",
+                onActivate: () => { this.onPanelClick() },
+                iconProps: {
+                  iconName: 'Add'
+                },
+                tooltipProps: {
+                  text: "Create Package Feed in Purpose using IRG"
+                }
+            },
+            {
+                id: "panel",
+                text: "Container Registry",
+                onActivate: () => { this.onPanelClick() },
+                iconProps: {
+                  iconName: 'Add'
+                },
+                tooltipProps: {
+                  text: "Create Azure Container Registry in Purpose using IRG"
+                }
+            }
+        ];
+    }
+    /*,
+            {
               id: "customDialog",
               text: "Custom Dialog",
               onActivate: () => { this.onCustomPromptClick() },
               tooltipProps: {
                 text: "Open a dialog with custom extension content"
               }
-            }
-        ];
-    }
+            },
+            {
+              id: "messageDialog",
+              text: "Message",
+              onActivate: () => { this.onMessagePromptClick() },
+              tooltipProps: {
+                text: "Open a simple message dialog"
+              }
+            }*/
 
     private async onMessagePromptClick(): Promise<void> {
         const dialogService = await SDK.getService<IHostPageLayoutService>(CommonServiceIds.HostPageLayoutService);
@@ -170,8 +210,8 @@ class HubContent extends React.Component<{}, IHubContentState> {
     private async onPanelClick(): Promise<void> {
         const panelService = await SDK.getService<IHostPageLayoutService>(CommonServiceIds.HostPageLayoutService);
         panelService.openPanel<boolean | undefined>(SDK.getExtensionContext().id + ".panel-content", {
-            title: "My Panel",
-            description: "Description of my panel",
+            title: "New Repository",
+            description: "Please fill out the following info.",
             configuration: {
                 message: "Show header description?",
                 initialValue: !!this.state.headerDescription
