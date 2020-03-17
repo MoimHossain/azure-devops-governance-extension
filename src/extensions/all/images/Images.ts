@@ -8,6 +8,10 @@ export class Images {
         return baseUrl;
     }
 
+    public getLogoIcon(): string {
+        return `${this.getBasePath()}/assets/images/logo.png`;
+    }
+
     public getAcrIcon(): string {
         return `${this.getBasePath()}/assets/images/azure-cr-logo.png`;
     }
