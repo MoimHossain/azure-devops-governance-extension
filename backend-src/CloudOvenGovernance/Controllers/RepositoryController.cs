@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using CloudOvenGovernance.Dtos;
 using Microsoft.AspNetCore.Authorization;
@@ -15,11 +17,11 @@ namespace CloudOvenGovernance.Controllers
 {
     [ApiController]
     [Route("api/{projectId}/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class RepositoryController : ControllerBase
     {
         #region Constructions
-
+        private const string REPOSCHEMAPATH = "resources/repository.json";
         private ILogger<RepositoryController> _logger = default(ILogger<RepositoryController>);
 
         private GitHttpClient _gitClient = default(GitHttpClient);
@@ -41,10 +43,11 @@ namespace CloudOvenGovernance.Controllers
             var repoName = $"{purpose}-ResourceAsCode";
             var master = "master";
 
-            var repositories = await GetAllRepositoryAsync(projectId, purpose, repoName);
+            var targetRepoName = GetRepoName(payload);
 
+            var repositories = await EnsureIaCRepositoryAsync(projectId, purpose, repoName);
             var repository = repositories
-                .FirstOrDefault(g => g.Name.StartsWith(purpose, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(g => g.Name.Equals(repoName, StringComparison.OrdinalIgnoreCase));
 
             if (repository != null)
             {
@@ -52,16 +55,17 @@ namespace CloudOvenGovernance.Controllers
 
                 if (!references.Any(r => r.Name.EndsWith("master", StringComparison.OrdinalIgnoreCase)))
                 {
-                    await CreateMasterBranchAsync(_gitClient, repository);
+                    await CreateMasterBranchAsync(_gitClient, repository, purpose);
                 }
 
                 references = await _gitClient.GetRefsAsync(repository.Id);
                 var masterRef = references
                     .FirstOrDefault(r => r.Name.EndsWith(master, StringComparison.OrdinalIgnoreCase));
 
-                await CreateCommitsAndPullRequest(_gitClient, repository, masterRef);
+                await CreateCommitsAndPullRequest(_gitClient, repository, masterRef, targetRepoName);
             }
         }
+
 
 
         [HttpGet]
@@ -74,13 +78,13 @@ namespace CloudOvenGovernance.Controllers
 
         #region Private methods
 
-        private async Task<List<GitRepository>> GetAllRepositoryAsync(
+        private async Task<List<GitRepository>> EnsureIaCRepositoryAsync(
             Guid projectId, string purpose, string repoName)
         {
             var repositories = await _gitClient.GetRepositoriesAsync(projectId);
 
             // If there is not yet a purpose repo create
-            if (!repositories.Any(g => g.Name.StartsWith(purpose, StringComparison.OrdinalIgnoreCase)))
+            if (!repositories.Any(g => g.Name.Equals(repoName, StringComparison.OrdinalIgnoreCase)))
             {
                 await _gitClient.CreateRepositoryAsync(new GitRepositoryCreateOptions
                 {
@@ -98,13 +102,23 @@ namespace CloudOvenGovernance.Controllers
 
 
         private static async Task CreateCommitsAndPullRequest(
-            GitHttpClient gitClient, GitRepository repository, GitRef masterRef)
+            GitHttpClient gitClient, GitRepository repository, GitRef masterRef, string targetRepoName)
         {
             var timeStamp = DateTime.UtcNow;
             var tick = $"{timeStamp.Day}-{timeStamp.ToString("MMM").ToLower()}-{timeStamp.Year}-{timeStamp.Hour}-{timeStamp.Minute}";
             var branchName = $"branch-{tick}";
             var branchRef = $"refs/heads/{branchName}";
             var masterBranchRef = $"refs/heads/master";
+
+
+            var content = await new StreamReader(
+                await gitClient.GetItemContentAsync(repository.Id, REPOSCHEMAPATH))
+                .ReadToEndAsync();
+
+            var resourceGraph = JsonSerializer.Deserialize<RepositoryCollection>(content);
+            var newRepo = new RepositoryTemplate();
+            newRepo.Properties.Name = targetRepoName;
+            resourceGraph.Resources.Add(newRepo);
 
             await gitClient.CreatePushAsync(new GitPush
             {
@@ -123,14 +137,17 @@ namespace CloudOvenGovernance.Controllers
                                 Comment = $"Changes added to the {branchName}",
                                 Changes = new List<GitChange>
                                 {
-                                    new GitChange
+                                  new GitChange
                                     {
                                         ChangeType = VersionControlChangeType.Edit,
-                                        Item = new GitItem { Path = "Readme.md" },
+                                        Item = new GitItem { Path = REPOSCHEMAPATH },
                                         NewContent = new ItemContent
                                         {
                                             ContentType = ItemContentType.RawText,
-                                            Content = "Edited 1"
+                                            Content = JsonSerializer.Serialize(resourceGraph, new JsonSerializerOptions
+                                            {
+                                                WriteIndented = true
+                                            })
                                         }
                                     }
                                 }
@@ -147,11 +164,15 @@ namespace CloudOvenGovernance.Controllers
         }
 
         private static async Task CreateMasterBranchAsync(
-            GitHttpClient gitClient, GitRepository repository)
+            GitHttpClient gitClient, GitRepository repository, string purposeId)
         {
             var branchName = "master";
             var branchRef = $"refs/heads/{branchName}";
             var emptyId = "0000000000000000000000000000000000000000";
+                 
+            var initResources = new RepositoryCollection();
+            initResources.PurposeId = purposeId;
+            initResources.Resources.Clear();
 
             await gitClient.CreatePushAsync(new GitPush
             {
@@ -179,11 +200,45 @@ namespace CloudOvenGovernance.Controllers
                                             ContentType = ItemContentType.RawText,
                                             Content = "This repository contains the resources as code."
                                         }
+                                    },
+                                    new GitChange
+                                    {
+                                        ChangeType = VersionControlChangeType.Add,
+                                        Item = new GitItem { Path = REPOSCHEMAPATH },
+                                        NewContent = new ItemContent
+                                        {
+                                            ContentType = ItemContentType.RawText,
+                                            Content = JsonSerializer.Serialize(initResources, new JsonSerializerOptions
+                                            {
+                                                WriteIndented = true
+                                            })
+                                        }
                                     }
                                 }
                             }
                         }
             }, repository.Id);
+        }
+
+
+        private string GetRepoName(ResourceChangePayload payload)
+        {
+            var defaultPurpose = "P000123";
+            var defaultRepoName = $"Repository-{DateTime.Now.Ticks}";
+
+            if (payload != null)
+            {
+                var name = payload.RepositoryNames.FirstOrDefault() ?? defaultRepoName;
+                var purpose = string.IsNullOrWhiteSpace(payload.Purpose) ? defaultPurpose : payload.Purpose;
+
+                if (!name.StartsWith(purpose, StringComparison.OrdinalIgnoreCase))
+                {
+                    name = $"{purpose}-{name}";
+                }
+
+                return name;
+            }
+            return $"{defaultPurpose}-{defaultRepoName}";
         }
         #endregion
     }

@@ -7,11 +7,16 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.Unicode;
+using System.Text;
+using System.IO;
+using System.Text.Json;
 
 namespace AzureDevOps.Sdk.ConsoleApp
 {
     class Program
     {
+        const string repoSchemaPath = "resources/repository.json";
         static void Main(string[] args)
         {
             var pat = Environment.GetEnvironmentVariable("AZDO_PERSONAL_ACCESS_TOKEN");
@@ -25,6 +30,7 @@ namespace AzureDevOps.Sdk.ConsoleApp
             var projectId = Guid.Parse("c335132d-ff5f-4371-ae28-ba7940f6eb92");
             var purpose = "P000123";
             var repoName = $"{purpose}-ResourceAsCode";
+            
             var connection = new VssConnection(
                 new Uri(orgUri),
                 new VssBasicCredential(string.Empty, pat));
@@ -49,6 +55,8 @@ namespace AzureDevOps.Sdk.ConsoleApp
 
             var repository = repositories
                 .FirstOrDefault(g => g.Name.StartsWith(purpose, StringComparison.OrdinalIgnoreCase));
+
+    
 
             if (repository != null)
             {
@@ -77,6 +85,17 @@ namespace AzureDevOps.Sdk.ConsoleApp
             var branchRef = $"refs/heads/{branchName}";
             var masterBranchRef = $"refs/heads/master";
 
+
+            var content = await new StreamReader(
+                await gitClient.GetItemContentAsync(repository.Id, repoSchemaPath))
+                .ReadToEndAsync();
+
+            var resourceGraph = JsonSerializer.Deserialize<RepositoryCollection>(content);
+            var newRepo = new RepositoryTemplate();
+            newRepo.Properties.Name = "P00123-RepositoryName";
+            resourceGraph.Resources.Add(newRepo);
+
+
             var push = await gitClient.CreatePushAsync(new GitPush
             {
                 RefUpdates = new List<GitRefUpdate>
@@ -97,11 +116,14 @@ namespace AzureDevOps.Sdk.ConsoleApp
                                     new GitChange
                                     {
                                         ChangeType = VersionControlChangeType.Edit,
-                                        Item = new GitItem { Path = "Readme.md" },
+                                        Item = new GitItem { Path = repoSchemaPath },
                                         NewContent = new ItemContent
                                         {
                                             ContentType = ItemContentType.RawText,
-                                            Content = "Edited 1"
+                                            Content = JsonSerializer.Serialize(resourceGraph, new JsonSerializerOptions
+                                            {
+                                                WriteIndented = true
+                                            })
                                         }
                                     }
                                 }
@@ -123,6 +145,12 @@ namespace AzureDevOps.Sdk.ConsoleApp
             var branchName = "master";
             var branchRef = $"refs/heads/{branchName}";
             var emptyId = "0000000000000000000000000000000000000000";
+
+            var repoTemplate = new RepositoryTemplate();
+            repoTemplate.Properties.MigrationGitUri = "https://gitlab.com/_git/myOldRepo";
+            repoTemplate.Properties.Name = "P00123-RepositoryName";
+            var initResources = new RepositoryCollection();
+            initResources.Resources.Add(repoTemplate);
 
             var push = await gitClient.CreatePushAsync(new GitPush
             {
@@ -149,6 +177,19 @@ namespace AzureDevOps.Sdk.ConsoleApp
                                         {
                                             ContentType = ItemContentType.RawText,
                                             Content = "This repository contains the resources as code."
+                                        }
+                                    },
+                                    new GitChange
+                                    {
+                                        ChangeType = VersionControlChangeType.Add,
+                                        Item = new GitItem { Path = repoSchemaPath },
+                                        NewContent = new ItemContent
+                                        {
+                                            ContentType = ItemContentType.RawText,
+                                            Content = JsonSerializer.Serialize(initResources, new JsonSerializerOptions
+                                            {
+                                                WriteIndented = true
+                                            })
                                         }
                                     }
                                 }
