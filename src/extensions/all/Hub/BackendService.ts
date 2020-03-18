@@ -11,6 +11,24 @@ export class BackendService {
         this.projectId = projectId;
     }
 
+    public async createRepoAsync(repositoryId:string, repositoryName:string) : Promise<any> {
+      const token = await SDK.getAppToken(); 
+      const data = {
+        purpose: 'P01234',
+        repositoryNames: [repositoryName],
+        feedNames: [],
+        keyVaultNames: [],
+        acrNames: []
+      };
+      await fetch(`${backendHost}/${this.projectId}/repository/${repositoryId}`, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+    }
     
     public async getAcrs(): Promise<any> {
       const token = await SDK.getAppToken(); 

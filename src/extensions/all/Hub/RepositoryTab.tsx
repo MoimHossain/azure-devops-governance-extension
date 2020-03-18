@@ -9,8 +9,7 @@ import { Panel } from "azure-devops-ui/Panel";
 import { Card } from "azure-devops-ui/Card";
 import { ScrollableList, IListItemDetails, ListSelection, ListItem } from "azure-devops-ui/List";
 import { Animation } from './../images/Animation';
-import { Button } from "azure-devops-ui/Button";
-import { ButtonGroup } from "azure-devops-ui/ButtonGroup";
+
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 
@@ -20,6 +19,8 @@ export interface IRepositoryTabState {
     projectName?: string;
     projectId?: string;
     repos?: any;
+    repoPanelIsBusy: boolean;
+    repoPromptValid: boolean;
 }
 
 export interface IRepositoryTabProperties {
@@ -38,11 +39,32 @@ export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRe
 
     constructor(props: IRepositoryTabProperties) {
         super(props);
-        this.state = { loading: true };
+        this.state = { loading: true, repoPromptValid: false, repoPanelIsBusy: false };
     }
 
     public componentDidMount() {
         this.initialize();
+    }
+
+    private async createRepositoryAsync() {
+        const projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
+        const project = await projectService.getProject();    
+        if(project) {
+            this.setState({repoPanelIsBusy: true});
+            await new BackendService(project.id)
+                .createRepoAsync(project.id, simpleObservable.value);
+            this.setState({repoPanelIsBusy: false});
+            this.props.onCollapse();
+        }
+    }
+
+    private getButtons() {
+        const items = [];
+        items.push({ text: "Cancel", onClick: () => this.props.onCollapse() });
+        if(!this.state.repoPanelIsBusy && this.state.repoPromptValid) {
+            items.push({ text: "Create", primary: true, onClick: () => this.createRepositoryAsync() });
+        }
+        return items;
     }
 
     public render(): JSX.Element {
@@ -75,10 +97,7 @@ export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRe
                             description={
                                 "Please fill out the information below."
                             }
-                            footerButtonProps={[
-                                { text: "Cancel", onClick: () => this.props.onCollapse() },
-                                { text: "Create", primary: true }
-                            ]}>
+                            footerButtonProps={this.getButtons()}>
                             <div>
                             
                                 <TextField
@@ -86,10 +105,18 @@ export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRe
                                         readOnly={false}
                                         spellCheck={false}     
                                         required={true}                                   
-                                        onChange={(e, newValue) => (simpleObservable.value = newValue)}
+                                        onChange={(e, newValue) => {
+                                            simpleObservable.value = newValue
+                                            if(newValue.length > 0) {
+                                                this.setState({ repoPromptValid: true })
+                                            }
+                                        }}
                                         placeholder="Enter Repository Name"
                                         width={TextFieldWidth.standard}
                                     />
+                                    {
+                                        this.state.repoPanelIsBusy && <p><Animation /></p>
+                                    }
                             </div>
                         </Panel>
                     }
@@ -136,7 +163,6 @@ export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRe
                 repos: repos,
                 loading: false
             });
-            console.log(repos)
         }
     }
 }
