@@ -15,8 +15,8 @@ import { Button } from "azure-devops-ui/Button";
 import { ButtonGroup } from "azure-devops-ui/ButtonGroup";
 
 export interface ISuccessComponentProps {
-    serverName?:string;
-    agentPoolName?:string;
+    serverName?: string;
+    agentPoolName?: string;
 }
 export interface IFeatureState {
     testingInProgress?: boolean;
@@ -52,13 +52,13 @@ class FeatureHubContent extends React.Component<{}, IFeatureState> {
 
         this.setState({
             connectionIsTested: false
-        });        
+        });
     };
     private onSelectNetwork = (event: React.SyntheticEvent<HTMLElement>, item: IListBoxItem<{}>) => {
         this.setState({
             connectionIsTested: false
-        });        
-    };    
+        });
+    };
 
     public render(): JSX.Element {
         const iframeUrl = window.location.href;
@@ -149,7 +149,7 @@ class FeatureHubContent extends React.Component<{}, IFeatureState> {
                                     <ButtonGroup>
                                         <Button
                                             text="Test Connection"
-                                            disabled={ this.state.testingInProgress === true }
+                                            disabled={this.state.testingInProgress === true}
                                             onClick={() => {
                                                 this.setState({
                                                     connectionIsTested: true,
@@ -159,14 +159,14 @@ class FeatureHubContent extends React.Component<{}, IFeatureState> {
                                                 setTimeout(() => {
                                                     this.setState({
                                                         testingInProgress: false
-                                                    })                                                    
+                                                    })
                                                 }, 1500);
                                             }}
-                                        />   
+                                        />
                                     </ButtonGroup>
 
                                 </td>
-                            </tr>                            
+                            </tr>
                         </table>
                     </Card>
 
@@ -174,27 +174,27 @@ class FeatureHubContent extends React.Component<{}, IFeatureState> {
                     {
                         this.state.connectionIsTested && <Card>
                             {this.state.testingInProgress && <Animation />}
-                            
+
                             {
                                 this.state.testingInProgress === false && <div>
                                     {
-                                        this.targetAgentPool.value === "CDaaSWin" && <ConnectionSuccessComponent 
-                                            agentPoolName={this.targetAgentPool.value} 
+                                        this.targetAgentPool.value === "CDaaSWin" && <ConnectionSuccessComponent
+                                            agentPoolName={this.targetAgentPool.value}
                                             serverName={this.targetServerName.value} />
                                     }
                                     {
-                                        this.targetAgentPool.value === "CDaaSLinux" && <ConnectionFailedComponent 
-                                            agentPoolName={this.targetAgentPool.value} 
-                                            serverName={this.targetServerName.value} />                                         
+                                        this.targetAgentPool.value === "CDaaSLinux" && <ConnectionFailedComponent
+                                            agentPoolName={this.targetAgentPool.value}
+                                            serverName={this.targetServerName.value} />
                                     }
-                                    
+
                                     <PortMatrixComponent />
                                 </div>
                             }
-                        </Card>                         
+                        </Card>
                     }
-      
-                   
+
+
                 </div>
 
 
@@ -209,7 +209,7 @@ class ConnectionSuccessComponent extends React.Component<ISuccessComponentProps,
             <div>
                 <table>
                     <tr>
-                        <td style={{width: 24}}>
+                        <td style={{ width: 24 }}>
                             <Status
                                 {...Statuses.Success}
                                 key="success"
@@ -218,23 +218,23 @@ class ConnectionSuccessComponent extends React.Component<ISuccessComponentProps,
                             />
                         </td>
                         <td>
-                            <h3 style={{paddingBottom: 4}}>Great, agent ({this.props.agentPoolName}) can successfully reach to target server ({this.props.serverName}). </h3>   
+                            <h3 style={{ paddingBottom: 4 }}>Great, agent ({this.props.agentPoolName}) can successfully reach to target server ({this.props.serverName}). </h3>
                         </td>
                     </tr>
                     <tr>
                         <td></td>
                         <td>
-                        <Button
-                            text="Empty Pipeline"
-                            tooltipProps={{text: 'Create a Relaese pipeline with the recommended Agent Pool'}}
-                            iconProps={{ iconName: "Add" }}
-                            primary={true}
-                            onClick={() => alert("TODO!")}
-                        />
+                            <Button
+                                text="Empty Pipeline"
+                                tooltipProps={{ text: 'Create a Relaese pipeline with the recommended Agent Pool' }}
+                                iconProps={{ iconName: "Add" }}
+                                primary={true}
+                                onClick={() => alert("TODO!")}
+                            />
                         </td>
                     </tr>
                 </table>
-                                  
+
             </div>
         );
     }
@@ -247,7 +247,7 @@ class ConnectionFailedComponent extends React.Component<ISuccessComponentProps, 
             <div>
                 <table>
                     <tr>
-                        <td style={{width: 24}}>
+                        <td style={{ width: 24 }}>
                             <Status
                                 {...Statuses.Failed}
                                 key="failed"
@@ -256,44 +256,43 @@ class ConnectionFailedComponent extends React.Component<ISuccessComponentProps, 
                             />
                         </td>
                         <td>
-                            <h3 style={{paddingBottom: 4}}>Nope, agent ({this.props.agentPoolName}) can't reach to target server ({this.props.serverName}). </h3>   
+                            <h3 style={{ paddingBottom: 4 }}>Nope, agent ({this.props.agentPoolName}) can't reach to target server ({this.props.serverName}). </h3>
                         </td>
                     </tr>
                 </table>
 
 
+                <p>You need to request a firewall change in the IPC portal. More info is at <a href="#"><span>Enable IPC deployment (Linux)</span></a>.</p>
+
+                <p>We have our RCEC’s in place to deploy to any datacenter, please check if you can reach them and make arrangement with your local datacenter firerwall’s to open the necessary ports.</p>
+
+                <p>RCEC / RCIC: Documentation describing the connection needs to be created and reviewed by the Review Committee External/Internal Connections.</p>
+
                 <table>
                     <tr>
                         <td style={{ width: 300 }}>
-                            <p>You need to request a firewall change in the IPC portal. More info is at <a href="#"><span>Enable IPC deployment (Linux)</span></a>.</p>
-                        
-                            <p>We have our RCEC’s in place to deploy to any datacenter, please check if you can reach them and make arrangement with your local datacenter firerwall’s to open the necessary ports.</p>
-                        
-                            <p>RCEC / RCIC: Documentation describing the connection needs to be created and reviewed by the Review Committee External/Internal Connections.</p>
+
                         </td>
                         <td>
-                        <Button
-                            text="RCEC Request"
-                            tooltipProps={{text: 'Create a RCEC request for required Firewall rule(s).'}}
-                            iconProps={{ iconName: "Add" }}
-                            onClick={() => alert("TODO!")}
-                        />
+                            <ButtonGroup>
+                                <Button
+                                    text="RCEC Request"
+                                    tooltipProps={{ text: 'Create a RCEC request for required Firewall rule(s).' }}
+                                    iconProps={{ iconName: "Add" }}
+                                    onClick={() => alert("TODO!")}
+                                />
+                                <Button
+                                    text="Empty Pipeline"
+                                    tooltipProps={{ text: 'Create a Relaese pipeline with the recommended Agent Pool' }}
+                                    iconProps={{ iconName: "Add" }}
+                                    primary={true}
+                                    onClick={() => alert("TODO!")}
+                                />
+                            </ButtonGroup>
                         </td>
-                    </tr>                    
-                    <tr>
-                        <td style={{ width: 300 }}></td>
-                        <td>
-                        <Button
-                            text="Empty Pipeline"
-                            tooltipProps={{text: 'Create a Relaese pipeline with the recommended Agent Pool'}}
-                            iconProps={{ iconName: "Add" }}
-                            primary={true}
-                            onClick={() => alert("TODO!")}
-                        />
-                        </td>
-                    </tr>                    
+                    </tr>
                 </table>
-                                  
+
             </div>
         );
     }
@@ -309,34 +308,51 @@ class PortMatrixComponent extends React.Component<{}, {}> {
         const cellStyleCenter = {
             paddingLeft: 8,
             paddingRight: 8,
-            border: "1px solid "            
-        };        
+            border: "1px solid "
+        };
 
         return (
             <p>
                 <h4>Release Agent machines in every data center offers a limited set of open ports.</h4>
-                <table style={{borderCollapse: "collapse"}}>
-                    <thead>
-                        <tr>
-                            <th style={cellStyle}>Service</th>
-                            <th align="center" style={cellStyleCenter}>Port(s)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style={cellStyle}>bash</td>
-                            <td align="center" style={cellStyleCenter}>22</td>
-                        </tr>
-                        <tr>
-                            <td style={cellStyle}>https</td>
-                            <td align="center" style={cellStyleCenter}>443 / 8443</td>
-                        </tr> 
-                        <tr>
-                            <td style={cellStyle}>SMB+</td>
-                            <td align="center" style={cellStyleCenter}>445</td>
-                        </tr>                                                
-                    </tbody>
+
+                <table>
+                    <tr>
+                        <td style={{ width: 300 }}>
+
+                        </td>
+                        <td>
+
+                        <table style={{ borderCollapse: "collapse" }}>
+                            <thead>
+                                <tr>
+                                    <th style={cellStyle}>Service</th>
+                                    <th align="center" style={cellStyleCenter}>Port(s)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style={cellStyle}>bash</td>
+                                    <td align="center" style={cellStyleCenter}>22</td>
+                                </tr>
+                                <tr>
+                                    <td style={cellStyle}>https</td>
+                                    <td align="center" style={cellStyleCenter}>443 / 8443</td>
+                                </tr>
+                                <tr>
+                                    <td style={cellStyle}>SMB+</td>
+                                    <td align="center" style={cellStyleCenter}>445</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                        </td>
+                    </tr>
                 </table>
+
+
+
+
             </p>
         );
     }
