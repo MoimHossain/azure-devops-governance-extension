@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "cloudoven-governance-extension",
     "publisher": "MoimHossain",
-    "version": "1.0.132",
+    "version": "1.0.194",
     "name": "CloudOven Governance",
     "description": "Azure DevOps extensions that provides some ease to developers still preserving the governancce rails intact.",
     "public": false,
@@ -45,6 +45,18 @@
                 "name": "Assistance",
                 "uri": "dist/Hub/hub.html"
             }
+        },
+        {
+            "id": "Agent Pool Assistance",
+            "type": "ms.vss-web.hub",
+            "targets": [
+                "ms.vss-build-web.build-release-hub-group"
+            ],
+            "properties": {
+                "name": "Agent Pool Assistance",
+                "uri": "dist/Feature/Feature.html"
+            }
+            
         }
     ],
     "files": [
