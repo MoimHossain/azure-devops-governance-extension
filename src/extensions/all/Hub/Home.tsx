@@ -38,12 +38,22 @@ export class HomeTab extends React.Component<{}, IHomeTabState> {
                                 width: 40, 
                                 float: 'left',
                                 marginLeft: '2%',
+                                marginTop: 18,
                                 height: 40 }} />
 		                </div>
-                        <div style={{marginLeft: 60, paddingLeft: 6}}>
-                            <h2>Welcome to Governance Assistance!</h2>                         
+                        <div style={{marginLeft: 60, paddingLeft: 14}}>
+                            <h1>Welcome to Governance Assistance!</h1>                         
                         </div>
                     </div>
+
+                    <div style={{
+                        width: '100%',
+                        height: 'auto',
+                        padding: '1%'
+                    }}>
+                    
+                    
+                    </div>                    
                 </Card>
             </div>
         );
