@@ -12,12 +12,7 @@ import { TitleSize } from "azure-devops-ui/Header";
 
 const logoPath = (new Images()).getLogoIcon();
 
-export interface IHomeTabState {
-
-}
-
-
-export class HomeTab extends React.Component<{}, IHomeTabState> {
+export class HomeTab extends React.Component<{}, {}> {
 
     constructor(props: {}) {
         super(props);
@@ -46,30 +41,29 @@ export class HomeTab extends React.Component<{}, IHomeTabState> {
 		                </div>
                         <div style={{marginLeft: 60, paddingLeft: 14}}>
                             <h1>Welcome to Governance Assistance!</h1>                         
-                        </div>
-
-
-                        <br/>
-                        <br/>
-
-                        <p>
-                        You're contributing the following purposes:
-                        <PurposeList />
-                    </p>
-
-                    <p>
-                        You are member of following Teams:
-                        <TeamList />
-                    </p>
-
-                    <p>
-                        Your Role:
-                        <RoleList />
-                    </p>
-                                     
-                    </div>
-                                 
+                        </div>       
+                    </div>                                 
                 </Card>
+
+
+                <Card titleProps={{
+                    text: "Purposes I contribute",
+                    size: TitleSize.Medium
+                }}>
+                    <PurposeList />
+                </Card>
+                <Card titleProps={{
+                    text: "Teams I belong",
+                    size: TitleSize.Medium
+                }}>
+                    <TeamList />
+                </Card>
+                <Card titleProps={{
+                    text: "Roles I have",
+                    size: TitleSize.Medium
+                }}>
+                    <RoleList />
+                </Card>                                
             </div>
         );
     }

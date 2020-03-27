@@ -27,7 +27,7 @@ const columns = [
         name: "Description",
         readonly: true,
         renderCell: renderSimpleCell,
-        width: new ObservableValue(200)
+        width: new ObservableValue(400)
     },
     ColumnFill
 ];
