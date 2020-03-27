@@ -303,6 +303,8 @@ class PortMatrixComponent extends React.Component<{}, {}> {
     public render(): JSX.Element {
         const cellStyle = {
             width: 80,
+            paddingLeft: 8,
+            paddingRight: 8,            
             border: "1px solid "
         };
         const cellStyleCenter = {

@@ -5,6 +5,11 @@ import * as React from "react";
 import { Card } from "azure-devops-ui/Card";
 import { Images } from './../images/Images';
 
+import { PurposeList } from './PurposeList';
+import { TeamList } from './TeamList';
+import { RoleList } from './RoleList';
+import { TitleSize } from "azure-devops-ui/Header";
+
 const logoPath = (new Images()).getLogoIcon();
 
 export interface IHomeTabState {
@@ -19,15 +24,13 @@ export class HomeTab extends React.Component<{}, IHomeTabState> {
         this.state = {};
     }
 
-    public componentDidMount() {
-        this.initialize();
-    }
-
-
     public render(): JSX.Element {
         return (
             <div className="page-content page-content-top flex-column rhythm-vertical-16">
-                <Card>
+                <Card titleProps={{
+                    text: "",
+                    size: TitleSize.Medium
+                }}>
                     <div style={{
                         width: '100%',
                         height: 'auto',
@@ -51,39 +54,23 @@ export class HomeTab extends React.Component<{}, IHomeTabState> {
 
                         <p>
                         You're contributing the following purposes:
-                        <ul>
-                            <li>P00123 (Active)</li>
-                            <li>P00124</li>
-                        </ul>
+                        <PurposeList />
                     </p>
 
                     <p>
                         You are member of following Teams:
-                        <ul>
-                            <li>T00123-Dev</li>
-                        </ul>
+                        <TeamList />
                     </p>
 
                     <p>
                         Your Role:
-                        <u>
-                            <li>Dev</li>
-                            <li>Ops</li>
-                        </u>
+                        <RoleList />
                     </p>
-                    <p>
-                        <b>Dev</b> Role: This role allows you to contribute to <b>Repositories</b>, creating
-                        build pipelines etc.
-
-                    </p>                        
+                                     
                     </div>
                                  
                 </Card>
             </div>
         );
     }
-
-    private async initialize() {
-
-                }
 }
