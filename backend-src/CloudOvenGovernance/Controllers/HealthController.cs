@@ -13,9 +13,13 @@ namespace CloudOvenGovernance.Controllers
     {
         // GET: api/Health
         [HttpGet]
-        public string Get()
+        public object Get()
         {
-            return "Healthy";
+            return new 
+            {
+                Status = "Healthy",
+                Version = "preview-1.0.23"
+            };
         }
 
     }

@@ -17,7 +17,7 @@ namespace CloudOvenGovernance.Controllers
 {
     [ApiController]
     [Route("api/{projectId}/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class RepositoryController : ControllerBase
     {
         #region Constructions
