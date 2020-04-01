@@ -34,9 +34,7 @@ export class KeyVaultTab extends React.Component<{}, IKeyVaultTabState> {
         this.state = { loading: true };
     }
 
-    public componentDidMount() {
-        this.initialize();
-    }
+
 
     public render(): JSX.Element {
         const { repos, loading } = this.state;
@@ -92,6 +90,9 @@ export class KeyVaultTab extends React.Component<{}, IKeyVaultTabState> {
         );
     };
 
+    public componentDidMount() {
+        this.initialize();
+    }    
     private async initialize() {
         const projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
         const project = await projectService.getProject();
