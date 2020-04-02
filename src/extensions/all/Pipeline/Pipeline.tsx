@@ -38,7 +38,7 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
         };
     }
 
-    private message: string = "View and manage pipelines within your Purpose (P0003).";
+
     public componentDidMount() {
         SDK.init();
         this.initialize();
@@ -90,12 +90,7 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
                 <Header title={"Pipelines in Purpose (P0002)"} />
 
                 <div className="page-content page-content-top flex-column rhythm-vertical-16">
-                    <MessageCard
-                        className="flex-self-stretch"
-                        severity={MessageCardSeverity.Info}
-                    >
-                        {this.message}
-                    </MessageCard>
+
 
 
                     <Card titleProps={{
