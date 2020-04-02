@@ -5,7 +5,7 @@ import * as SDK from "azure-devops-extension-sdk";
 import { Card } from "azure-devops-ui/Card";
 import { Header } from "azure-devops-ui/Header";
 import { Page } from "azure-devops-ui/Page";
-
+import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
 import { showRootComponent } from "../../Common";
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
@@ -18,6 +18,8 @@ import { CommonServiceIds, IProjectPageService } from "azure-devops-extension-ap
 import { BuildList } from "./BuildList";
 import { ReleaseList } from './ReleaseList';
 import { TitleSize } from "azure-devops-ui/Header";
+import { IHostNavigationService, IHostPageLayoutService } from "azure-devops-extension-api";
+
 
 export interface IPipelineState {
     projectId?: string;
@@ -29,6 +31,7 @@ export interface IPipelineState {
 
 class PipelineHubContent extends React.Component<{}, IPipelineState> {
 
+    private navService?:IHostNavigationService;
 
     constructor(props: {}) {
         super(props);
@@ -70,6 +73,7 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
     }
 
     private async initialize() {
+        this.navService = await SDK.getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
         const projectService = await SDK.getService<IProjectPageService>
             (CommonServiceIds.ProjectPageService);
         const project = await projectService.getProject();
@@ -87,7 +91,10 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
 
         return (
             <Page className="sample-hub flex-grow">
-                <Header title={"Pipelines in Purpose (P0002)"} />
+                <Header title="Pipelines in Purpose (P0002)"
+                    commandBarItems={this.getCommandBarItems()}
+                    description=""
+                    titleSize={ TitleSize.Medium} />                
 
                 <div className="page-content page-content-top flex-column rhythm-vertical-16">
 
@@ -97,32 +104,20 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
                             text: "Builds",
                             size: TitleSize.Medium
                         }}>
+                                                 
                             <BuildList builds={this.state.builds} />   
-                            <Button
-                                text="New Pipeline"
-                                tooltipProps={{ text: 'Create a Build pipeline with the recommended Agent Pool' }}
-                                iconProps={{ iconName: "Add" }}
-                                primary={true}
-                                onClick={() => {
-                                        document.location.href = "https://dev.azure.com/cloudoven/CloudOven/_apps/hub/ms.vss-build-web.ci-designer-hub?pipelinePath=%5CP0002"; 
-                                }}
-                            />                                                                         
+                                                                      
                     </Card>
 
                     <Card titleProps={{
                             text: "Releases",
                             size: TitleSize.Medium
                         }}>
+                                               
                             <ReleaseList releases={this.state.releases} />    
-                            <Button
-                                text="New Release Pipeline"
-                                tooltipProps={{ text: 'Create a Relaese pipeline with the recommended Agent Pool' }}
-                                iconProps={{ iconName: "Add" }}
-                                primary={true}
-                                onClick={() => {
-                                    document.location.href = "https://dev.azure.com/cloudoven/CloudOven/_releaseDefinition?definitionId=0&_a=action-create-definition&source=ReleaseNew&path=%5CP0002"; 
-                            }}
-                            />                                                                        
+
+                          
+                                                                       
                     </Card>                    
 
 
@@ -130,6 +125,50 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
             </Page>
         );
     }
+
+
+    private getCommandBarItems(): IHeaderCommandBarItem[] {
+
+        const items = [];
+        items.push({
+            id: "build",
+            text: "Build Pipeline",
+            onActivate:  () => { 
+                if(this.navService) {
+                    this.navService.navigate("https://dev.azure.com/cloudoven/CloudOven/_apps/hub/ms.vss-build-web.ci-designer-hub?pipelinePath=%5CP0002"); 
+                }
+                
+            },
+            iconProps: {
+              iconName: 'Add'
+            },
+            isPrimary: true,
+            tooltipProps: {
+              text: "Create New Build Pipeline"
+            }
+          });
+
+          items.push({
+            id: "release",
+            text: "Release Pipeline",
+            onActivate: async () => { 
+                if(this.navService) {
+                    this.navService.navigate("https://dev.azure.com/cloudoven/CloudOven/_releaseDefinition?definitionId=0&_a=action-create-definition&source=ReleaseNew&path=%5CP0002"); 
+                }
+               
+            },
+            iconProps: {
+              iconName: 'Add'
+            },
+            isPrimary: false,
+            tooltipProps: {
+              text: "Create New Release Pipeline"
+            }
+          });          
+      
+        return items;
+    }
+
 }
 
 

@@ -7,7 +7,7 @@ SDK.register("QueryParamsService", () => {
         handleQueryParams: async () => {
             const navService = await SDK.getService<IHostNavigationService>(CommonServiceIds.HostNavigationService);
             const queryParams = await navService.getQueryParams();
-
+   
             if (queryParams["showMyPanel"] === "true") {
 
                 const title = queryParams["myPanelTitle"] || "My Panel";
