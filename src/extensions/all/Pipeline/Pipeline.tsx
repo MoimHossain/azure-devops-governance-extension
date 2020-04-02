@@ -15,7 +15,9 @@ import { Button } from "azure-devops-ui/Button";
 import { ButtonGroup } from "azure-devops-ui/ButtonGroup";
 import { BackendService } from '../Hub/BackendService';
 import { CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
-
+import { BuildList } from "./BuildList";
+import { ReleaseList } from './ReleaseList';
+import { TitleSize } from "azure-devops-ui/Header";
 
 export interface IPipelineState {
     projectId?: string;
@@ -96,10 +98,20 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
                     </MessageCard>
 
 
-                    <Card>
-
-                        
+                    <Card titleProps={{
+                            text: "Builds",
+                            size: TitleSize.Medium
+                        }}>
+                            <BuildList builds={this.state.builds} />                                                
                     </Card>
+
+                    <Card titleProps={{
+                            text: "Releases",
+                            size: TitleSize.Medium
+                        }}>
+                            <ReleaseList releases={this.state.releases} />                                                
+                    </Card>                    
+
 
                 </div>
             </Page>
