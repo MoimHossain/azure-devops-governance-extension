@@ -5,7 +5,7 @@ import * as SDK from "azure-devops-extension-sdk";
 import { Card } from "azure-devops-ui/Card";
 import { Header } from "azure-devops-ui/Header";
 import { Page } from "azure-devops-ui/Page";
-import { MessageCard, MessageCardSeverity } from "azure-devops-ui/MessageCard";
+
 import { showRootComponent } from "../../Common";
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
@@ -97,14 +97,32 @@ class PipelineHubContent extends React.Component<{}, IPipelineState> {
                             text: "Builds",
                             size: TitleSize.Medium
                         }}>
-                            <BuildList builds={this.state.builds} />                                                
+                            <BuildList builds={this.state.builds} />   
+                            <Button
+                                text="New Pipeline"
+                                tooltipProps={{ text: 'Create a Build pipeline with the recommended Agent Pool' }}
+                                iconProps={{ iconName: "Add" }}
+                                primary={true}
+                                onClick={() => {
+                                        document.location.href = "https://dev.azure.com/cloudoven/CloudOven/_apps/hub/ms.vss-build-web.ci-designer-hub?pipelinePath=%5CP0002"; 
+                                }}
+                            />                                                                         
                     </Card>
 
                     <Card titleProps={{
                             text: "Releases",
                             size: TitleSize.Medium
                         }}>
-                            <ReleaseList releases={this.state.releases} />                                                
+                            <ReleaseList releases={this.state.releases} />    
+                            <Button
+                                text="New Release Pipeline"
+                                tooltipProps={{ text: 'Create a Relaese pipeline with the recommended Agent Pool' }}
+                                iconProps={{ iconName: "Add" }}
+                                primary={true}
+                                onClick={() => {
+                                    document.location.href = "https://dev.azure.com/cloudoven/CloudOven/_releaseDefinition?definitionId=0&_a=action-create-definition&source=ReleaseNew&path=%5CP0002"; 
+                            }}
+                            />                                                                        
                     </Card>                    
 
 
