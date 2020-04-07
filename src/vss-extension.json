@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "cloudoven-governance-extension",
     "publisher": "MoimHossain",
-    "version": "1.0.238",
+    "version": "1.0.260",
     "name": "CloudOven Governance",
     "description": "Azure DevOps extensions that provides some ease to developers still preserving the governancce rails intact.",
     "public": false,
@@ -17,55 +17,64 @@
     ],
     "contributions": [
         {
-            "id": "governance-hub-group",
+            "id": "ing-hub-group",
             "type": "ms.vss-web.hub-group",
-            "description": "Provides governance actions.",
+            "description": "Provides ING OnePipeline actions.",
             "targets": [
                 "ms.vss-web.project-hub-groups-collection"
             ],
-            "icons": {
-                "default": "assets/images/Compliance.23CEVucgCyd_3b8B.png"
-            },
             "properties": {
-                "icons": {
-                    "default": "assets/images/Compliance.23CEVucgCyd_3b8B.png"
-                },
-                "icon": "assets/images/Compliance.23CEVucgCyd_3b8B.png",                
-                "name": "Governance",
-                "order": 100
+                "icon": {
+                    "light": "assets/images/logo.png",
+                    "dark": "assets/images/logo.png"
+                },     
+                "name": "ING OnePipeline",
+                "order": 101
             }
         },
+        {
+            "id": "ing-purpose-pipeline",
+            "type": "ms.vss-web.hub",
+            "targets": [
+                ".ing-hub-group"
+            ],
+            "properties": {
+                "order": 1,
+                "icon": {
+                    "light": "assets/images/agent-pool.png",
+                    "dark": "assets/images/agent-pool.png"
+                },
+                "name": "Purpose Pipelines",
+                "uri": "dist/Pipeline/Pipeline.html"
+            }            
+        },        
         {
             "id": "Governance",
             "type": "ms.vss-web.hub",
             "targets": [
-                ".governance-hub-group"
+                ".ing-hub-group"
             ],
             "properties": {
-                "name": "Assistance",
+                "name": "IRG (Governance)",
+                "icon": {
+                    "light": "assets/images/agent-pool.png",
+                    "dark": "assets/images/agent-pool.png"
+                },
+                "description": "IRG Governance allows you to provision repository, service connection etc. via ING Resource Governor.",
                 "uri": "dist/Hub/hub.html"
             }
-        },
-        {
-            "id": "Purpose Pipelines",
-            "type": "ms.vss-web.hub",
-            "targets": [
-                "ms.vss-build-web.build-release-hub-group"
-            ],
-            "properties": {
-                "order": 2,
-                "icon": "assets/images/logo.png",
-                "name": "Purpose Pipelines",
-                "uri": "dist/Pipeline/Pipeline.html"
-            }            
         },
         {
             "id": "Agent Pool Assistance",
             "type": "ms.vss-web.hub",
             "targets": [
-                "ms.vss-build-web.build-release-hub-group"
+                ".ing-hub-group"
             ],
             "properties": {
+                "icon": {
+                    "light": "assets/images/agent-pool.png",
+                    "dark": "assets/images/agent-pool.png"
+                },                
                 "name": "Agent Pool Assistance",
                 "uri": "dist/Feature/Feature.html",
                 "order": 102

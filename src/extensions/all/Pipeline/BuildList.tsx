@@ -1,6 +1,7 @@
 
 
 import * as React from "react";
+import "./TableStyle.scss";
 
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import {
@@ -73,9 +74,7 @@ export class BuildList extends React.Component<IBuildListProps, {}> {
         }
 
         return (
-            <div className="page-content page-content-top flex-column rhythm-vertical-16">
-                <Table columns={columns} itemProvider={new ArrayItemProvider<ITeamListTableItem>(items)} role="table" />
-            </div>
+            <Table containerClassName="cloudoven-filled-table" columns={columns} itemProvider={new ArrayItemProvider<ITeamListTableItem>(items)} role="table" />
         );
     }
 }
