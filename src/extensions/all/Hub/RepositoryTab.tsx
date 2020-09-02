@@ -12,8 +12,15 @@ import { Animation } from './../images/Animation';
 
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
-
+import { Toggle } from "azure-devops-ui/Toggle";
+const gitlabToken = new ObservableValue<string>("");
 const simpleObservable = new ObservableValue<string>("");
+const gitlabRepoName = new ObservableValue<string>("");
+const gitlabProjectName = new ObservableValue<string>("");
+const repositoryInitialized = new ObservableValue<boolean>(true);
+const importGitLabRepo = new ObservableValue<boolean>(false);
+const demoPurposeID = "P03278";
+
 export interface IRepositoryTabState {
     loading: boolean;
     projectName?: string;
@@ -62,9 +69,37 @@ export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRe
         const items = [];
         items.push({ text: "Cancel", onClick: () => this.props.onCollapse() });
         if(!this.state.repoPanelIsBusy && this.state.repoPromptValid) {
-            items.push({ text: "Create", primary: true, onClick: () => this.createRepositoryAsync() });
+            items.push({ text: "Commit", primary: true, onClick: () => this.createRepositoryAsync() });
         }
         return items;
+    }
+
+    private generateIrgCode() {
+        var gitLabSnippet = '';
+        if(importGitLabRepo.value === true) {
+            gitLabSnippet = `
+                "importFrom": {
+                    "gitUrl": "https://[do_not_change]@gitlab.ing.net/${gitlabProjectName.value}/${gitlabRepoName.value}",
+                    "gitToken": "${btoa(gitlabToken.value)}"
+                },`;
+        }
+
+        var lines = `
+    {
+        "type": "PurposeResourceDefinition",
+        "version": "1.0",
+        "purposeId": "${demoPurposeID}",
+        "description": "Requested a new Git Repository",
+        "resources": [{
+            "type": "azuredevops.gitrepository",
+            "name": "${demoPurposeID}-${simpleObservable.value}",
+            "resourceProperties": {${gitLabSnippet}
+                "uninitialized": ${(repositoryInitialized.value === false).toString()}
+            }
+        }]
+    }
+        `;
+        return lines;
     }
 
     public render(): JSX.Element {
@@ -93,9 +128,9 @@ export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRe
                         this.props.repoExpanded && 
                         <Panel
                             onDismiss={() => this.props.onCollapse()}
-                            titleProps={{ text: "New Repository" }}
+                            titleProps={{ text: "New Git Repository" }}
                             description={
-                                "Please fill out the information below."
+                                "Please follow the steps below:"
                             }
                             footerButtonProps={this.getButtons()}>
                             <div>
@@ -111,9 +146,91 @@ export class RepositoryTab extends React.Component<IRepositoryTabProperties, IRe
                                                 this.setState({ repoPromptValid: true })
                                             }
                                         }}
-                                        placeholder="Enter Repository Name"
+                                        placeholder="Enter Repository Name (without Purpose ID)"
                                         width={TextFieldWidth.standard}
-                                    />
+                                    /><br/>
+                                    <Toggle
+                                        offText={"Do not initialize the repository"}
+                                        onText={"Initialize the repository"}
+                                        checked={repositoryInitialized}
+                                        onChange={(event, value) => {
+                                            repositoryInitialized.value = value;
+                                            this.forceUpdate();
+                                        }}
+                                    /><br/><br/>
+                                    <Toggle
+                                        offText={"Do not import GitLab repository"}
+                                        onText={"Import GitLab repository"}
+                                        checked={importGitLabRepo}
+                                        onChange={(event, value) => {
+                                            importGitLabRepo.value = value;
+                                            this.forceUpdate();
+                                        }}
+                                    /><br/><br/>
+                                    {
+                                        importGitLabRepo.value === true &&                                 
+                                        <div>
+                                            <TextField
+                                                value={gitlabProjectName}
+                                                readOnly={false}
+                                                spellCheck={false}     
+                                                required={true}                                   
+                                                onChange={(e, newValue) => {
+                                                    gitlabProjectName.value = newValue;
+                                                    this.forceUpdate();
+                                                }}
+                                                placeholder="GitLab Project Name"
+                                                width={TextFieldWidth.standard}
+                                            /><br/>                                       
+                                            <TextField
+                                                value={gitlabRepoName}
+                                                readOnly={false}
+                                                spellCheck={false}     
+                                                required={true}                                   
+                                                onChange={(e, newValue) => {
+                                                    gitlabRepoName.value = newValue;
+                                                    this.forceUpdate();
+                                                }}
+                                                placeholder="GitLab Repository Name"
+                                                width={TextFieldWidth.standard}
+                                            /><br/>
+                                            <TextField
+                                                ariaLabel="Aria label"
+                                                placeholder="GitLab Token"
+                                                value={gitlabToken}
+                                                onChange={(e, newValue) => {
+                                                    gitlabToken.value = newValue;
+                                                    this.forceUpdate();
+                                                }}
+                                                multiline
+                                                rows={4}
+                                                width={TextFieldWidth.standard}
+                                            />                                                                           
+                                        </div>
+                                    }
+                                                                                                          
+
+                                    <br/>
+
+                                    <span>Repository Name: <b>{demoPurposeID}-{simpleObservable.value}</b></span>
+
+                                    <br/><br/>
+                                    <span>Add the following code in your <i>resource.json</i> file in IRG resource reopository (<b>P03278-Default</b>) merge the changes to <i>master</i> branch.</span>
+                                    <br/>
+                                    <pre style={{
+                                        width: 440,
+                                        borderColor: 'darkgray',
+                                        borderWidth: 1,
+                                        borderStyle: 'solid',
+                                        overflowX: 'auto',
+                                        backgroundColor: 'black'
+                                    }}>
+                                        <code>
+                                            {this.generateIrgCode()}
+                                        </code>
+                                    </pre><br/>
+
+
                                     {
                                         this.state.repoPanelIsBusy && <p><Animation /></p>
                                     }
