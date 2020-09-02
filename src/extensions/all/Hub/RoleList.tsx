@@ -16,12 +16,20 @@ import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 const columns = [
     {
         columnLayout: TableColumnLayout.singleLinePrefix,
+        id: "purpose",
+        name: "Purpose",
+        readonly: true,
+        renderCell: renderSimpleCell,
+        width: new ObservableValue(200)
+    },
+    {
+        columnLayout: TableColumnLayout.singleLinePrefix,
         id: "name",
         name: "Name",
         readonly: true,
         renderCell: renderSimpleCell,
         width: new ObservableValue(200)
-    },
+    },    
     {
         id: "desc",
         name: "Description",
@@ -40,12 +48,15 @@ interface IRoleListTableItem extends ISimpleTableCell {
 
 const items = new ArrayItemProvider<IRoleListTableItem>(
     [{
+        purpose: 'P03278',
         name: 'Dev',
         desc: 'Dev Role allows you to create repository, commit changes manage builds.'
     },{
+        purpose: 'P03278',
         name: 'Ops',
         desc: 'With Ops role you can manage relese management.'
     },{
+        purpose: 'P03278',
         name: 'PO',
         desc: 'With PO role, you are accountable for manageing the backlogs.'
     }]

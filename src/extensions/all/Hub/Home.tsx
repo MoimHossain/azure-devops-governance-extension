@@ -47,19 +47,19 @@ export class HomeTab extends React.Component<{}, {}> {
 
 
                 <Card titleProps={{
-                    text: "Purposes I contribute",
+                    text: "My purposes",
                     size: TitleSize.Medium
                 }}>
                     <PurposeList />
                 </Card>
                 <Card titleProps={{
-                    text: "Teams I belong",
+                    text: "My teams",
                     size: TitleSize.Medium
                 }}>
                     <TeamList />
                 </Card>
                 <Card titleProps={{
-                    text: "Roles I have",
+                    text: "My roles",
                     size: TitleSize.Medium
                 }}>
                     <RoleList />
